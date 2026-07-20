@@ -1,0 +1,19 @@
+MARILAB MOVER E1.6.9 - VERCEL PNPM FIX
+
+Problema corretto:
+- Vercel arrestava sia npm ci sia npm install con "Exit handler never called!".
+- L'errore avveniva prima della build e non dipendeva dall'app o da Supabase.
+
+Correzione:
+- Node.js resta 22.x, richiesto da Expo SDK 57.
+- Vercel non usa più npm per installare o compilare.
+- Installazione: corepack pnpm@10.28.0 install --no-frozen-lockfile
+- Build: corepack pnpm@10.28.0 run build
+- Rimossi i retry npm personalizzati che prolungavano il blocco.
+
+Deploy da PowerShell nella cartella estratta:
+  npx vercel@latest link
+  npx vercel@latest --prod --force
+
+Quando "vercel link" lo chiede, collega il progetto esistente marilab-mover.
+Non ripetere SQL, chiavi VAPID, segreti Supabase o deploy delle Edge Functions.

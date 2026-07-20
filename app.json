@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Marilab Mover",
+    "slug": "marilab-mover",
+    "version": "1.6.9",
+    "orientation": "default",
+    "icon": "./assets/images/icon.png",
+    "scheme": "marilabmover",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "icon": "./assets/images/icon.png",
+      "bundleIdentifier": "it.marilab.mover",
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#051F30",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "it.marilab.mover",
+      "permissions": [
+        "POST_NOTIFICATIONS"
+      ],
+      "versionCode": 17,
+      "googleServicesFile": "./google-services.json"
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#051F30",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 92
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#08A7D4",
+          "defaultChannel": "deliveries"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": false
+    },
+    "description": "Marilab Mover 1.6.9: affidabilità Push multi-dispositivo Web/PWA, Android e iOS con registrazione server, coda per singolo dispositivo, retry controllati e ricevute Expo. Autore: Fabio Carratù.",
+    "extra": {
+      "author": "Fabio Carratù",
+      "privacy": "Nessun dato sanitario o allegato. Solo dati operativi e account aziendali autorizzati.",
+      "router": {},
+      "eas": {
+        "projectId": "60570208-f4ac-486f-a133-916a11ec42b5"
+      }
+    },
+    "owner": "fubnes"
+  }
+}

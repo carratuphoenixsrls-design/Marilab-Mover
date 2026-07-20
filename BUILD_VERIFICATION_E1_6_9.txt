@@ -1,0 +1,45 @@
+MARILAB MOVER E1.6.9 - BUILD & RELIABILITY VERIFICATION
+Data verifica: 20/07/2026
+Autore: Fabio Carratù
+
+ESITI LOCALI
+- npm ci: SUPERATO
+- npm ls: SUPERATO; nessuna dipendenza obbligatoria mancante
+- ESLint Expo: SUPERATO
+- TypeScript strict (tsc --noEmit): SUPERATO
+- Collaudo statico: 114/114 controlli superati
+- Simulazione Push: 6 scenari di stato + 14 invarianti superati
+- Edge Functions Deno: 4/4 file controllati
+- SQL PostgreSQL: migrazione E1.6.9 e cron analizzati senza errori sintattici
+- Expo config locale: SUPERATO
+- Expo prebuild Android: SUPERATO; POST_NOTIFICATIONS e package verificati
+- Expo prebuild iOS: SUPERATO; aps-environment e bundle verificati
+- Expo bundle Android: SUPERATO (Hermes bundle generato)
+- Expo bundle iOS: SUPERATO (Hermes bundle generato)
+- Expo Web export: SUPERATO
+- dist/index.html, dist/sw.js, dist/manifest.json e icone PWA: PRESENTI
+- npm audit --omit=dev: 0 high, 0 critical, 11 moderate transitive Expo
+
+COPERTURA PUSH
+- Web/PWA + Android + iOS contemporanei
+- app aperta, background e terminata (nei limiti del sistema operativo)
+- invio parziale per singolo dispositivo
+- retry temporanei e limite massimo tentativi
+- token Expo cambiato/revocato
+- sottoscrizione Web scaduta o VAPID cambiata
+- risposta gateway incompleta
+- protezione invii doppi concorrenti
+- broadcast di sistema riservati agli Admin e test vincolati al proprietario del dispositivo
+- notifiche applicative validate rispetto all’azione reale che le ha generate
+- ricevute definitive Expo
+- recupero al ritorno online/in primo piano
+
+NON VERIFICABILE SENZA AMBIENTE LIVE
+- credenziali FCM V1 presenti nell'account EAS
+- credenziali APNs e profilo Apple presenti nell'account EAS
+- segreti VAPID/CRON effettivamente presenti su Supabase
+- ricezione fisica su dispositivi reali dopo il deploy
+- comportamento imposto da Focus/Riepilogo iOS, risparmio energetico e force-stop Android
+
+ESITO DEL CODICE E DEL PACCHETTO: SUPERATO
+Il collaudo end-to-end finale deve essere eseguito dopo il deploy con la matrice inclusa.

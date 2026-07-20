@@ -1,0 +1,11 @@
+MARILAB MOVER E1.6.9 - VERCEL DEPLOY FIX
+
+Correzioni applicate:
+- Node.js fissato a 22.x
+- npm fissato a 10.9.2
+- Installazione Vercel cambiata da "npm ci" a "npm install"
+
+Deploy da PowerShell nella cartella del progetto:
+  npx vercel@latest --prod --force
+
+Non occorre modificare chiavi Supabase, VAPID, FCM o APNs.

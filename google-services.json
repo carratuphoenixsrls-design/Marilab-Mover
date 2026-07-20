@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "284944752718",
+    "project_id": "marilab-mover",
+    "storage_bucket": "marilab-mover.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:284944752718:android:694d974c7384ae31d2e31f",
+        "android_client_info": {
+          "package_name": "it.marilab.mover"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFtho3HLqc3VSveoTT0X3GSBL3CaeLKgI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

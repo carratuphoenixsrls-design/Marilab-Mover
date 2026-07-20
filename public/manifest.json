@@ -1,0 +1,49 @@
+{
+  "id": "/",
+  "name": "Marilab Mover Enterprise",
+  "short_name": "Mover",
+  "description": "Spostamenti, consegne, chat e notifiche operative Marilab · versione 1.6.9",
+  "lang": "it-IT",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "orientation": "any",
+  "background_color": "#F2F6F7",
+  "theme_color": "#061F30",
+  "categories": [
+    "business",
+    "productivity"
+  ],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Apri Marilab Mover",
+      "short_name": "Apri",
+      "url": "/",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ]
+}

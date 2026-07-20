@@ -1,0 +1,30 @@
+MARILAB MOVER E1.6.9 - CARICAMENTO DA ZERO
+
+Questo archivio è già predisposto con i file del progetto direttamente nella radice.
+Non caricare lo ZIP su GitHub: estrailo e carica tutti i file e le cartelle contenuti.
+
+GITHUB
+1. Apri il nuovo repository vuoto.
+2. Add file > Upload files.
+3. Trascina TUTTO il contenuto estratto, compresi .gitignore, .npmrc e .env.example.
+4. Commit changes.
+
+VERCEL
+1. Importa il nuovo repository GitHub.
+2. Framework Preset: Other.
+3. Root Directory: lascia vuoto / ./
+4. Le istruzioni di installazione e build sono già in vercel.json.
+5. Inserisci le variabili Environment prima del deploy.
+
+VARIABILI CLIENT VERCEL
+- EXPO_PUBLIC_SUPABASE_URL
+- EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+- EXPO_PUBLIC_APP_MODE = live
+- EXPO_PUBLIC_EAS_PROJECT_ID
+- EXPO_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY
+
+Non inserire mai service_role, password database, chiave VAPID privata o segreti Cron in GitHub/Vercel client.
+
+SUPABASE
+Il progetto contiene schema, migrazioni ed Edge Functions nella cartella supabase.
+Se stai mantenendo lo stesso progetto Supabase, non ricreare il database e non rieseguire migrazioni già applicate.

@@ -1,0 +1,84 @@
+MARILAB MOVER E1.6.9 - PUBBLICAZIONE CORRETTA
+
+IMPORTANTE
+Esegui tutto dalla cartella che contiene package.json.
+La migrazione SQL E1.6.9 va applicata UNA SOLA VOLTA.
+
+1) APPLICA LA MIGRAZIONE DATABASE
+
+Apri Supabase > SQL Editor > New query.
+Copia ed esegui tutto il file:
+  supabase\MIGRAZIONE_E1_6_9_PUSH_RELIABILITY.sql
+
+L'esecuzione corretta termina senza errori.
+
+2) PUBBLICA LE DUE EDGE FUNCTIONS
+
+Puoi avviare:
+  DEPLOY_SUPABASE_PUSH_E1_6_9.bat
+
+Oppure PowerShell:
+  npx supabase@latest login
+  npx supabase@latest link --project-ref nfiscouwoblfdkppcgcg
+  npx supabase@latest functions deploy send-global-push
+  npx supabase@latest functions deploy scheduled-reminders --no-verify-jwt
+
+3) CONFIGURA IL CRON OGNI 15 MINUTI
+
+Avvia:
+  CONFIGURA_PROMEMORIA_AUTOMATICI.bat
+
+Poi esegui nel SQL Editor il file generato:
+  supabase\cron_reminders_generated.sql
+
+Infine ELIMINA il file generato perché contiene il segreto Cron.
+
+4) PUBBLICA IL WEB SU VERCEL
+
+Avvia:
+  DEPLOY_VERCEL_E1_6_9.bat
+
+Oppure:
+  npx vercel --prod
+
+5) CREA NUOVE BUILD NATIVE
+
+Android APK di prova:
+  npx eas-cli@latest build --platform android --profile preview
+
+iOS di prova:
+  npx eas-cli@latest build --platform ios --profile preview
+
+Produzione:
+  npx eas-cli@latest build --platform all --profile production
+
+Prima della build controlla nell'account Expo/EAS:
+- Android: credenziale FCM V1 del progetto Firebase marilab-mover;
+- iOS: chiave APNs e credenziali Apple valide.
+
+6) TESTA OGNI DISPOSITIVO
+
+Su ciascun PC, PWA, Android e iPhone:
+- accedi con l'utente corretto;
+- apri “Notifiche push”;
+- premi “Attiva su questo dispositivo”;
+- premi “Invia test”;
+- verifica ricezione con app aperta, in background e chiusa;
+- ripeti il test simultaneamente su almeno un Web/PWA, un Android e un iPhone.
+
+Per iPhone Web/PWA:
+- iOS/iPadOS 16.4 o successivo;
+- apri il sito in Safari;
+- Condividi > Aggiungi alla schermata Home;
+- apri Marilab Mover esclusivamente dall'icona Home;
+- attiva le notifiche dall'app.
+
+7) CONTROLLO ADMIN
+
+Apri la diagnostica Push Admin:
+- dispositivi nativi e Web devono essere conteggiati;
+- “Consegne in coda” deve tornare a zero dopo i retry/ricevute;
+- verificare eventuali errori delle ultime 24 ore.
+
+Per il collaudo completo usa:
+  docs\MATRICE_TEST_PUSH_WEB_ANDROID_IOS.md

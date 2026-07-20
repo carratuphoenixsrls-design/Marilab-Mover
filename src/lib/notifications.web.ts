@@ -126,13 +126,14 @@ function readCachedServerKey() {
 }
 
 export function getConfiguredWebPushPublicKey() {
-  // La variabile incorporata nella build è la fonte primaria. In questo modo
-  // una vecchia chiave salvata dal browser non impedisce il rinnovo VAPID.
-  const environmentKey = normalizeVapidPublicKey(process.env.EXPO_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY ?? '');
-  if (isValidVapidPublicKey(environmentKey)) return environmentKey;
-
+  // La Edge Function è la fonte autorevole: primeWebPush salva qui la chiave
+  // realmente associata alla chiave privata del server. La variabile Vercel
+  // resta solo un fallback di avvio quando la lettura dal server non è ancora disponibile.
   const cachedServerKey = readCachedServerKey();
   if (isValidVapidPublicKey(cachedServerKey)) return cachedServerKey;
+
+  const environmentKey = normalizeVapidPublicKey(process.env.EXPO_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY ?? '');
+  if (isValidVapidPublicKey(environmentKey)) return environmentKey;
 
   return '';
 }

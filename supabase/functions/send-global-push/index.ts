@@ -29,6 +29,7 @@ function response(body: Record<string, unknown>, status = 200) {
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
+  if (req.method !== 'POST') return response({ ok: false, error: 'Metodo non consentito.' }, 405);
 
   try {
     const authorization = req.headers.get('Authorization');
@@ -76,14 +77,25 @@ Deno.serve(async (req) => {
 
       const subscription = body?.subscription as {
         endpoint?: unknown;
+        expirationTime?: unknown;
         keys?: { p256dh?: unknown; auth?: unknown };
+        p256dh?: unknown;
+        auth?: unknown;
       } | undefined;
-      const endpoint = String(subscription?.endpoint ?? '').trim();
-      const p256dh = String(subscription?.keys?.p256dh ?? '').trim();
-      const auth = String(subscription?.keys?.auth ?? '').trim();
+      const endpoint = String(subscription?.endpoint ?? body?.endpoint ?? '').trim();
+      const p256dh = String(subscription?.keys?.p256dh ?? subscription?.p256dh ?? body?.p256dh ?? '').trim();
+      const auth = String(subscription?.keys?.auth ?? subscription?.auth ?? body?.auth ?? '').trim();
       const userAgent = String(body?.userAgent ?? '').slice(0, 1000);
       if (!endpoint.startsWith('https://') || !p256dh || !auth) {
-        throw new Error('Sottoscrizione Web Push incompleta o non valida.');
+        return response({
+          ok: false,
+          error: 'Sottoscrizione Web Push incompleta o non valida.',
+          fields: {
+            endpoint: endpoint.startsWith('https://'),
+            p256dh: Boolean(p256dh),
+            auth: Boolean(auth),
+          },
+        }, 400);
       }
 
       const { error: registrationError } = await adminClient.from('web_push_subscriptions').upsert({

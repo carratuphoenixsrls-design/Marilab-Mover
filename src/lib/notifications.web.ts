@@ -3,9 +3,9 @@ import type { PushRegistrationResult, WebPushSubscriptionPayload } from './notif
 const VAPID_STORAGE_KEY = 'marilab-mover-web-push-vapid-public-key';
 const SERVER_VAPID_STORAGE_KEY = 'marilab-mover-server-vapid-public-key';
 
-// La chiave VAPID pubblica può essere distribuita nel client: non è un segreto.
-// Resta un fallback per evitare che una variabile Vercel mancante blocchi il browser.
-const DEFAULT_WEB_PUSH_VAPID_PUBLIC_KEY = 'BARtzKfQwCDIS-PCD9V64iT1Q_yuHVHZ1XG_WQEepZo65M5N-K_hYi4piP9rFIKVscuPNRJ2xwS5jsrtsakqp6s';
+// La chiave VAPID pubblica non è un segreto, ma deve coincidere con quella
+// configurata nelle Edge Functions Supabase. Non incorporiamo fallback fissi:
+// una configurazione mancante deve essere rilevata subito e non mascherata.
 
 function normalizeVapidPublicKey(value: string) {
   let normalized = value.trim();
@@ -40,6 +40,25 @@ function arrayBufferToBase64Url(value: ArrayBuffer | null) {
   let binary = '';
   bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
   return globalThis.btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '');
+}
+
+function serializeWebPushSubscription(subscription: PushSubscription): WebPushSubscriptionPayload {
+  const json = subscription.toJSON();
+  const endpoint = String(json.endpoint ?? subscription.endpoint ?? '').trim();
+  const p256dh = String(json.keys?.p256dh ?? arrayBufferToBase64Url(subscription.getKey('p256dh'))).trim();
+  const auth = String(json.keys?.auth ?? arrayBufferToBase64Url(subscription.getKey('auth'))).trim();
+
+  return {
+    endpoint,
+    expirationTime: json.expirationTime ?? subscription.expirationTime ?? null,
+    keys: { p256dh, auth },
+  };
+}
+
+function isCompleteWebPushSubscription(subscription: WebPushSubscriptionPayload) {
+  return subscription.endpoint.startsWith('https://')
+    && Boolean(subscription.keys.p256dh)
+    && Boolean(subscription.keys.auth);
 }
 
 function isIosLike() {
@@ -93,7 +112,7 @@ export function cacheWebPushPublicKey(value: string) {
   try {
     globalThis.localStorage?.setItem(SERVER_VAPID_STORAGE_KEY, normalized);
   } catch {
-    // Il fallback incorporato resta disponibile.
+    // La variabile Production o una nuova lettura dal server restano disponibili.
   }
   return true;
 }
@@ -107,13 +126,15 @@ function readCachedServerKey() {
 }
 
 export function getConfiguredWebPushPublicKey() {
-  const cachedServerKey = readCachedServerKey();
-  if (isValidVapidPublicKey(cachedServerKey)) return cachedServerKey;
-
+  // La variabile incorporata nella build è la fonte primaria. In questo modo
+  // una vecchia chiave salvata dal browser non impedisce il rinnovo VAPID.
   const environmentKey = normalizeVapidPublicKey(process.env.EXPO_PUBLIC_WEB_PUSH_VAPID_PUBLIC_KEY ?? '');
   if (isValidVapidPublicKey(environmentKey)) return environmentKey;
 
-  return DEFAULT_WEB_PUSH_VAPID_PUBLIC_KEY;
+  const cachedServerKey = readCachedServerKey();
+  if (isValidVapidPublicKey(cachedServerKey)) return cachedServerKey;
+
+  return '';
 }
 
 export async function prepareWebPushServiceWorker() {
@@ -190,16 +211,28 @@ export async function registerForPushNotificationsAsync(requestPermission = fals
       });
     }
 
-    rememberSubscriptionKey(publicKey);
-    const json = subscription.toJSON() as WebPushSubscriptionPayload;
-    if (!json.endpoint || !json.keys?.p256dh || !json.keys?.auth) {
-      return { ok: false, permission, error: 'Il browser non ha restituito una sottoscrizione Web Push completa.' };
+    let payload = serializeWebPushSubscription(subscription);
+    if (!isCompleteWebPushSubscription(payload)) {
+      // Una sottoscrizione vecchia o corrotta può essere ancora conservata dal
+      // browser. La rimuoviamo e tentiamo una sola nuova registrazione pulita.
+      await subscription.unsubscribe().catch(() => false);
+      subscription = await registration.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey,
+      });
+      renewed = true;
+      payload = serializeWebPushSubscription(subscription);
     }
 
+    if (!isCompleteWebPushSubscription(payload)) {
+      return { ok: false, permission, error: 'Il browser non ha restituito endpoint e chiavi Web Push complete.' };
+    }
+
+    rememberSubscriptionKey(publicKey);
     return {
       ok: true,
       provider: 'web',
-      subscription: json,
+      subscription: payload,
       permission,
       deviceName: `${navigator.platform || 'Browser'} · ${navigator.userAgent.slice(0, 120)}${renewed ? ' · chiave aggiornata' : ''}`,
     };
@@ -207,7 +240,6 @@ export async function registerForPushNotificationsAsync(requestPermission = fals
     return { ok: false, permission: Notification.permission || 'error', error: readableError(error) };
   }
 }
-
 
 export function subscribeToPushTokenRefresh(_listener: (result: PushRegistrationResult) => void) {
   return () => undefined;
